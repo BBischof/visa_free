@@ -62,14 +62,27 @@ def compute_visa_isomorphism_classes(links):
 
 def create_pairwise_networks(nodes, links):
   pairwise_nodes = {}
-    for a in CONTS:
-      for b in CONTS:
-        pairwise_nodes[(a,b)] = []
-        for d in CONTS[a]:
-          pairwise_nodes[(a,b)].append({"name": d, "continent": a, "type": "origin"})
-        for c in CONTS[b]:
-          for t in ["free", "onarrival", "required", "refused"]:
-            pairwise_nodes[(a,b)].append({"name": c, "continent": b, "type": t})
+  pairwise_links = {}
+  for a in CONTS:
+    for b in CONTS:
+      pairwise_nodes[a + "-" + b] = []
+      for d in CONTS[a]:
+        pairwise_nodes[a + "-" + b].append({"name": d, "continent": a, "type": "origin", "y": nodes[d][1]})
+      for c in CONTS[b]:
+        for t in ["free", "onarrival", "required", "refused"]:
+          pairwise_nodes[a + "-" + b].append({"name": c, "continent": b, "type": t})
+      pairwise_links[a + "-" + b] = []
+      for t in links:
+        for l in links[t]:
+          if (l["source"]["continent"] == a and l["target"]["continent"] == b): 
+            source_node = {"name": l["source"]["name"], "continent": l["source"]["continent"] , "type": "origin", "y": l["source"]["y"]}
+            target_node = {"name": l["target"]["name"], "continent": l["target"]["continent"] , "type": t, "y": l["target"]["y"]}
+            term = l["term"]
+            notes = l["notes"]
+            pairwise_links[a + "-" + b].append({"source": source_node, "target": target_node, "term": term , "notes": notes})
+  return (pairwise_nodes, pairwise_links)
+
+
 
 def main(data_folder, output_key):
   nodes = []
@@ -82,9 +95,12 @@ def main(data_folder, output_key):
     out = parse_lines_into_links("output_data/" + f, countries)
     for s in links:
       links[s] += out[s]
-  return json.dumps({"nodes": nodes, "links": links[output_key]}) 
+  pair_dicts = create_pairwise_networks(countries, links)
+  #print pair_dicts[1][("North America", "Oceania")], len(pair_dicts[1][("North America", "Oceania")])
+  return json.dumps({"pairwise_nodes": pair_dicts[0], "pairwise_links": pair_dicts[1]})
+  #return json.dumps({"nodes": nodes, "links": links[output_key]}) 
 
 '''CL arguments are data_folder and output_key'''
 if __name__=="__main__":
-  main(sys.argv[1])
+  print main(sys.argv[1], sys.argv[2])
   # print create_continents_dictionary()
