@@ -70,7 +70,7 @@ def create_pairwise_networks(nodes, links):
         pairwise_nodes[a + "-" + b].append({"name": d, "continent": a, "type": "origin", "y": nodes[d][1]})
       for c in CONTS[b]:
         for t in ["free", "onarrival", "required", "refused"]:
-          pairwise_nodes[a + "-" + b].append({"name": c, "continent": b, "type": t})
+          pairwise_nodes[a + "-" + b].append({"name": c , "continent": b, "type": t, "y": nodes[c][1]})
       pairwise_links[a + "-" + b] = []
       for t in links:
         for l in links[t]:
@@ -84,7 +84,7 @@ def create_pairwise_networks(nodes, links):
 
 
 
-def main(data_folder, output_key):
+def main(data_folder, output_key=""):
   nodes = []
   countries = create_continents_dictionary()
   for x in countries:
