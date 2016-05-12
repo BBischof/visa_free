@@ -65,12 +65,6 @@ def create_pairwise_networks(nodes, links):
   pairwise_links = {}
   for a in CONTS:
     for b in CONTS:
-      pairwise_nodes[a + "-" + b] = []
-      for d in CONTS[a]:
-        pairwise_nodes[a + "-" + b].append({"name": d, "continent": a, "type": "origin", "y": nodes[d][1]})
-      for c in CONTS[b]:
-        for t in ["free", "onarrival", "required", "refused"]:
-          pairwise_nodes[a + "-" + b].append({"name": c , "continent": b, "type": t, "y": nodes[c][1]})
       pairwise_links[a + "-" + b] = []
       for t in links:
         for l in links[t]:
@@ -80,6 +74,15 @@ def create_pairwise_networks(nodes, links):
             term = l["term"]
             notes = l["notes"]
             pairwise_links[a + "-" + b].append({"source": source_node, "target": target_node, "term": term , "notes": notes})
+      pairwise_nodes[a + "-" + b] = []    
+      for d in CONTS[a]:      
+        pairwise_nodes[a + "-" + b].append({"name": d, "continent": a, "type": "origin", "y": nodes[d][1]})         
+      for l in pairwise_links[a + "-" + b]:
+        if l["target"] not in pairwise_nodes[a + "-" + b]:
+          pairwise_nodes[a + "-" + b].append(l["target"])
+  #print "old:", len(pairwise_nodes_old[("North America-Africa")])#, pairwise_nodes_old[("North America-Africa")][:10]
+  #print "new", len(pairwise_nodes[("North America-Africa")])#, pairwise_nodes[("North America-Africa")][:10]
+  #print set(pairwise_nodes[("North America-Africa")]).difference(set(pairwise_nodes_old[("North America-Africa")]))
   return (pairwise_nodes, pairwise_links)
 
 
@@ -96,7 +99,8 @@ def main(data_folder, output_key=""):
     for s in links:
       links[s] += out[s]
   pair_dicts = create_pairwise_networks(countries, links)
-  #print pair_dicts[1][("North America", "Oceania")], len(pair_dicts[1][("North America", "Oceania")])
+  # print pair_dicts_old[1][("North America-Oceania")], len(pair_dicts_old[1][("North America-Oceania")])
+  # print pair_dicts[1][("North America-Oceania")], len(pair_dicts[1][("North America-Oceania")])
   return json.dumps({"pairwise_nodes": pair_dicts[0], "pairwise_links": pair_dicts[1]})
   #return json.dumps({"nodes": nodes, "links": links[output_key]}) 
 
