@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Hive Link Plot</title>
+	<style type="text/css">
+	.link{
+		fill: none;
+    stroke: #000;
+		stroke-width: 1.5px;
+    stroke-opacity: .2;
+	}
+
+
+	.axis {
+		stroke: #000;
+		stroke-width: 1.5px;
+	}
+
+
+
+.link.active {
+  stroke-width: 3px;
+  stroke-opacity: 1;
+}
+
+.node {
+  stroke: #000;
+}
+
+.node.active {
+  stroke: red;
+  stroke-width: 3px;
+  stroke-opacity: 1;
+}
+
+	</style>
+</head>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="../static/d3.hive.min.js"></script>
+<script type="text/javascript">
+
+var width = 1000;
+var height = 1000;
+var outerRadius = 400;
+var innerRadius = 10;
+
+
+
+var visa_types = {'free': 1, 'required': 4, 'refused': 2, 'onarrival': 3, 'origin': 0};
+
+
+// var angle = d3.scale.ordinal()
+// 		.domain(d3.range(6))
+// 		.rangePoints([0,2 * Math.PI]);
+
+var angle = d3.scale.ordinal()
+    .domain(["origin", "free", "refused", "required", "onarrival"])
+    .range([0, Math.PI/2, 11 * Math.PI / 12, 3 * Math.PI / 2, 13 * Math.PI / 12]);
+
+// alert(angle(1));
+
+var radius = d3.scale.linear()
+		.range([innerRadius, outerRadius]);
+
+
+// var color = d3.scale.category20()
+// 		.domain(d3.range(20));
+
+
+var color = ["yellow", "blue", "red", "orange", "green"];
+
+
+var svg = d3.select("body").append("svg")
+		.attr("width", width)
+		.attr("height", height)
+	.append("g")
+		.attr("transform", "translate(" + width/2 + "," + height/2 + ")");
+
+
+
+svg.selectAll(".axis")
+		.data(d3.range(5))
+	.enter().append("line")
+		.attr("class", "axis")
+		.attr("transform", function(d){ return "rotate(" + degrees(angle(d)) + ")";})
+    .attr("x1", radius.range()[0])
+		.attr("x2", radius.range()[1])
+    ;
+
+
+
+
+d3.json("pairwise_datasets.json", function(error, graph){
+  nodes = graph.pairwise_nodes['Europe-Asia'];
+  links = graph.pairwise_links['Europe-Asia'];
+
+  // console.log(nodes[55].y);
+
+  // nodes.forEach(function(d){
+  //   console.log(d.y);
+  // })
+
+
+  var free_links = links.filter(function(p){ return p.target.type == 'free';});
+  var onarrival_links = links.filter(function(p){ return p.target.type == 'onarrival';});
+  var required_links = links.filter(function(p){ return p.target.type == 'required';});
+  var refused_links = links.filter(function(p){ return p.target.type == 'refused';});
+
+
+  var visa_lengths = [{'name': 'origin', 'length': 50}, {'name': 'free', 'length': free_links.length}, {'name': 'onarrival', 'length': onarrival_links.length}, {'name': 'required', 'length':  required_links.length}, {'name': 'refused', 'length': refused_links.length}];
+
+
+  // radius.domain(d3.extent(visa_lengths, function(d){ return d.length; }));
+
+  // svg.selectAll(".axis")
+  //     .data(visa_lengths)
+  //   .enter().append("line")
+  //     .attr("class", "axis")
+  //     .attr("transform", function(d, i){ return "rotate(" + degrees(angle(i)) + ")";})
+  //     .attr("x1", radius(-2))
+  //     .attr("x2", function(d){return radius(d.length + 2);})
+  //     ;
+
+
+
+  svg.selectAll(".link")
+      .data(links)
+    .enter().append("path")
+      .attr("class", "link")
+      .attr("d", d3.hive.link()
+      .angle(function(d) { return angle(visa_types[d.type]); })
+      .radius(function(d) { return radius(d.y); }))
+      .style("stroke", function(d) { return color[visa_types[d.target.type]]; })
+      .on("mouseover", linkMouseover)
+      .on("mouseout", mouseout)
+      .append("title")
+      .text(function(d){ return d.source.name + ' --> ' + d.target.name})
+      ;
+
+
+
+  svg.selectAll(".node")
+      .data(nodes)
+    .enter().append("circle")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "rotate(" + degrees(angle(visa_types[d.type])) + ")"; })
+      .attr("cx", function(d) { return radius(d.y); })
+      .attr("r", 5)
+      .style("fill", function(d) { return color[visa_types[d.type]]; })
+      .on("mouseover", nodeMouseover)
+      .on("mouseout", mouseout)
+      .append("title")
+      .text(function(d){ return d.name; })
+      ;
+
+
+  function linkMouseover(d) {
+    svg.selectAll(".link").classed("active", function(p) { return p === d; });
+    svg.selectAll(".node").classed("active", function(x) { return x.name === d.source.name || x.name === d.target.name; });
+  }
+
+
+
+  // Highlight the node and connected links on mouseover.
+  function nodeMouseover(d) {
+    svg.selectAll(".link").classed("active", function(p) { return p.source.name === d.name || p.target.name === d.name; });
+    d3.select(this).classed("active", true);
+  }
+
+
+
+  // Clear any highlighted nodes or links.
+  function mouseout() {
+    svg.selectAll(".active").classed("active", false);
+  }
+
+  });
+
+function degrees(radians) {
+  return radians / Math.PI * 180 - 90;
+}
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
