@@ -12,9 +12,9 @@ def create_continents_dictionary():
 
 def parse_lines_into_links(filename, cont_dict):
   '''out_United_States'''
+  d = {}
   source_name = " ".join(re.sub(r'out_','',filename).split("_"))[12:]
   source = {"name": source_name, "continent": cont_dict[source_name][0], 'y': cont_dict[source_name][1]}
-  d = {}
   link_types = {"free":[], "required": [], "onarrival": [], "refused": []}
   for i,line in enumerate(open(filename).readlines()):
     line = line.rstrip()
@@ -30,39 +30,30 @@ def parse_lines_into_links(filename, cont_dict):
   return link_types
 
 def compute_visa_isomorphism_classes(links):
-  country_sets = {}
+  country_sets, isomorphic_countries,  isom_classes = {}, {}, {}
   for y in CONTS:
     country_sets[y] = {}
     for c in CONTS[y]:
       country_sets[y][c] = {"free": set(), "required": set(), "onarrival": set(), "refused": set()}
-  for t in links:
-    for n in links[t]:
+  for l in links:
+    for n in links[l]:
       s = n["source"]
-      country_sets[s["continent"]][s["name"]][t].add(n["target"]["name"])
-  isomorphic_countries = {}
-  for x in country_sets:
-    for y in country_sets[x]:
-      isomorphic_countries[y] = {"free":[], "required": [], "onarrival": [], "refused": []}
-      for z in country_sets[x]:
-        if country_sets[x][y]["free"] == country_sets[x][z]["free"]:
-          isomorphic_countries[y]["free"].append(z)
-        if country_sets[x][y]["onarrival"] == country_sets[x][z]["onarrival"]:
-          isomorphic_countries[y]["onarrival"].append(z)
-        if country_sets[x][y]["required"] == country_sets[x][z]["required"]:
-          isomorphic_countries[y]["required"].append(z)
-        if country_sets[x][y]["refused"] == country_sets[x][z]["refused"]:
-          isomorphic_countries[y]["refused"].append(z)
-  isom_classes = {}
-  isom_classes["free"] = [(x,isomorphic_countries[x]["free"]) for x in [c for c in isomorphic_countries if len(isomorphic_countries[c]["free"])>1]]
-  isom_classes["onarrival"] = [(x,isomorphic_countries[x]["onarrival"]) for x in [c for c in isomorphic_countries if len(isomorphic_countries[c]["onarrival"])>1]]
-  isom_classes["required"] = [(x,isomorphic_countries[x]["required"]) for x in [c for c in isomorphic_countries if len(isomorphic_countries[c]["required"])>1]]
-  isom_classes["refused"] = [(x,isomorphic_countries[x]["refused"]) for x in [c for c in isomorphic_countries if len(isomorphic_countries[c]["refused"])>1]]
+      country_sets[s["continent"]][s["name"]][l].add(n["target"]["name"])
+  for t in ["free", "onarrival", "required", "refused"]:
+    for x in country_sets:
+      for y in country_sets[x]:
+        if y in isomorphic_countries:
+          isomorphic_countries[y].update({t: []}) 
+        else: 
+          isomorphic_countries[y] = {t: []}
+        for z in country_sets[x]:
+          if country_sets[x][y][t] == country_sets[x][z][t]:
+            isomorphic_countries[y][t].append(z)
+    isom_classes[t] = [(x,isomorphic_countries[x][t]) for x in [c for c in isomorphic_countries if len(isomorphic_countries[c][t])>1]]
   return isom_classes
 
 def create_pairwise_networks(nodes, links):
-  pairwise_nodes = {}
-  pairwise_nodes_old = {}
-  pairwise_links = {}
+  pairwise_nodes, pairwise_nodes_old, pairwise_links = {}, {}, {}
   for a in CONTS:
     for b in CONTS:
       pairwise_nodes[a + "-" + b] = []
@@ -77,54 +68,29 @@ def create_pairwise_networks(nodes, links):
           if (l["source"]["continent"] == a and l["target"]["continent"] == b): 
             source_node = {"name": l["source"]["name"], "continent": l["source"]["continent"] , "type": "origin", "y": l["source"]["y"]}
             target_node = {"name": l["target"]["name"], "continent": l["target"]["continent"] , "type": t, "y": l["target"]["y"]}
-            term = l["term"]
-            notes = l["notes"]
-            pairwise_links[a + "-" + b].append({"source": source_node, "target": target_node, "term": term , "notes": notes})
+            pairwise_links[a + "-" + b].append({"source": source_node, "target": target_node, "term": l["term"] , "notes": l["notes"]})
       pairwise_nodes[a + "-" + b] = []
-      pairwise_nodes_old[a + "-" + b] = []
       for d in CONTS[a]:
-        pairwise_nodes_old[a + "-" + b].append({"name": d, "continent": a, "type": "origin", "y": nodes[d][1]})
         pairwise_nodes[a + "-" + b].append({"name": d, "continent": a, "type": "origin", "y": nodes[d][1]})
-      for c in CONTS[b]:
-        for t in ["free", "onarrival", "required", "refused"]:
-            pairwise_nodes_old[a + "-" + b].append({"name": c , "continent": b, "type": t, "y": nodes[c][1]})
       for l in pairwise_links[a + "-" + b]:
         if l["target"] not in pairwise_nodes[a + "-" + b]:
           pairwise_nodes[a + "-" + b].append(l["target"])
   return (pairwise_nodes, pairwise_links)
-  #print "old:", len(pairwise_nodes_old[("North America-Africa")])#, pairwise_nodes_old[("North America-Africa")][:10]
-  #print "new", len(pairwise_nodes[("North America-Africa")])#, pairwise_nodes[("North America-Africa")][:10]
-  #print set(pairwise_nodes[("North America-Africa")]).difference(set(pairwise_nodes_old[("North America-Africa")]))
 
 
 def compute_y_values(nodes, links):
   type_lists = {}
-  #print filter(lambda l: l["target"]["type"] == "required", links["Asia-Africa"])
   for a in CONTS:
     for b in CONTS:
       type_lists[a + "-" + b] = {}
       for t in ["required", "refused", "onarrival", "free"]:
-        #print "starting: " + t 
-        #print len(filter(lambda l: l["type"] == t, nodes[a + "-" + b]))
-        #print nodes[a + "-" + b]
         type_lists[a + "-" + b][t] = filter(lambda l: l["type"] == t, nodes[a + "-" + b])
-        #print len(type_lists[a + "-" + b][t])
-        #type_lists[a + "-" + b][t]=(len(nodes[a + "-" + b].filter{"type" = t})
         order = len(type_lists[a + "-" + b][t])
-        # print order
         indices = {}
         for i,x in enumerate([z["name"] for z in type_lists[a + "-" + b][t]]):
-          # print i,x
           indices[x] = i 
-        # print len(indices)
         map(lambda m: m.update({"y": float(indices[m["name"]]+1)/order }), filter(lambda l: l["type"] == t, nodes[a + "-" + b]))
-        #print nodes[a + "-" + b][:1000]
-        # print a, b, t, len(filter(lambda l: l["target"]["type"] == t, links[a + "-" + b]))
-        # for x in filter(lambda l: l["target"]["type"] == t, links[a + "-" + b]):
-        #   print indices[x["target"]["name"]] 
         map(lambda s: s["target"].update({"y": float(indices[s["target"]["name"]]+1)/order}), filter(lambda l: l["target"]["type"] == t, links[a + "-" + b]))
-        #print filter(lambda l: l["target"]["type"] == t, links[a + "-" + b])
-  #print links["Asia-Africa"][:100]
   return nodes, links
 
 
@@ -140,8 +106,7 @@ def main(data_folder, output_key=""):
     for s in links:
       links[s] += out[s]
   pair_dicts = create_pairwise_networks(countries, links)
-  # print pair_dicts_old[1][("North America-Oceania")], len(pair_dicts_old[1][("North America-Oceania")])
-  # print pair_dicts[1][("North America-Oceania")], len(pair_dicts[1][("North America-Oceania")])
+  print compute_visa_isomorphism_classes(links)
   #return json.dumps({"pairwise_nodes": pair_dicts[0], "pairwise_links": pair_dicts[1]})
   #return json.dumps({"nodes": nodes, "links": links[output_key]}) 
   u, v = compute_y_values(pair_dicts[0], pair_dicts[1])
@@ -149,5 +114,4 @@ def main(data_folder, output_key=""):
 
 '''CL arguments are data_folder and output_key'''
 if __name__=="__main__":
-  print main(sys.argv[1], sys.argv[2])
-  # print create_continents_dictionary()
+  main(sys.argv[1], sys.argv[2])
