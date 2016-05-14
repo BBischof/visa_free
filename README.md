@@ -18,6 +18,28 @@ Reducing the dataset to something managable requires us to change the structure 
 
 This means that there will be `7^2=49` visualizations(one for each pair, allowing for a pair of the same continent). We designate one of the pair's elements to be the source continent, and the other to be the destination. Now we fan the destination continent's countries over the four axes based on the status of the visa to that country. The primary axis at zero degrees represents the source or "origin". We still color based on status for readability, and to create a clear correlation between amount of a color on the graph, and the frequency of that status in the continent pair. Note that we only draw nodes that have at least one edge incedent on them. In the case where a country has no relationships(edges) of a particular visa-status, that country will not appear as a node on that axis of the visualization.
 
+Note that the need for self-edges in the form of a chord diagram on one axis is removed by the ability to select the same continent for the source and target.
+
+## A couple miss-steps 
+
+Often these projects are presented as "here is the final beautiful version because we're so smart". In the spirit of communicating the real path taken in this visualization, here are some things that didn't work:
+
+### Country isomorphisms and clustering
+
+One might think "all the countries in Scandanavia probably have the same visa policies"; one would be wrong. You could ask this for countries in the Carribean, Central America, Pacific Islands, or whatever else you dream up. 
+
+*In fact, no two countries in any continent share exactly the same visa policies, not even when reducing to free, on-arrival, or required statuses*
+
+We implemented a method to compair every pair of countries in a continent to find candidates for this kind of reduction, and were shocked at how distict the visa policies are.
+
+### Cliques and sub-networks
+
+One might guess that groups of countries would create a kind of sub-network of 'free' visas. While this is true to a certain extent, it doesn't fit with our general data model, and doesn't show information about all countries. It is, however, interesting as a supplment.
+
+### All nodes per axis
+
+An early mistake was showing all nodes from a continent on each status-axis. Initially our idea was that this would give a sense of the proportion of countries on a continent that have that status from the source continent. However, the huge amount of isolated nodes on the graph was extremely ugly. In some network visualization examples, isolated nodes are important, and tell you extremely important information about the network, but not in our case. The information provided by these isolated nodes, was uninteresting for the most part, and can be inferred without them being there. Also, a small factor was that reducing the number of target nodes by `3/4` improves visualization performance.
+
 ## Style Choices
 
 We chose primary colors because the number of necessary colors was small. We expanded the `origin` axis and scaled other axes to reasonably provide room for the corresponding numbers of nodes.
