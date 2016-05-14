@@ -52,13 +52,12 @@ def compute_visa_isomorphism_classes(links):
           isomorphic_countries[y]["required"].append(z)
         if country_sets[x][y]["refused"] == country_sets[x][z]["refused"]:
           isomorphic_countries[y]["refused"].append(z)
-  # print country_sets["Africa"]["Zimbabwe"]
-  # print isomorphic_countries["Sweden"]
   isom_classes = {}
   isom_classes["free"] = [(x,isomorphic_countries[x]["free"]) for x in [c for c in isomorphic_countries if len(isomorphic_countries[c]["free"])>1]]
   isom_classes["onarrival"] = [(x,isomorphic_countries[x]["onarrival"]) for x in [c for c in isomorphic_countries if len(isomorphic_countries[c]["onarrival"])>1]]
   isom_classes["required"] = [(x,isomorphic_countries[x]["required"]) for x in [c for c in isomorphic_countries if len(isomorphic_countries[c]["required"])>1]]
   isom_classes["refused"] = [(x,isomorphic_countries[x]["refused"]) for x in [c for c in isomorphic_countries if len(isomorphic_countries[c]["refused"])>1]]
+  return isom_classes
 
 def create_pairwise_networks(nodes, links):
   pairwise_nodes = {}
@@ -92,11 +91,41 @@ def create_pairwise_networks(nodes, links):
       for l in pairwise_links[a + "-" + b]:
         if l["target"] not in pairwise_nodes[a + "-" + b]:
           pairwise_nodes[a + "-" + b].append(l["target"])
+  return (pairwise_nodes, pairwise_links)
   #print "old:", len(pairwise_nodes_old[("North America-Africa")])#, pairwise_nodes_old[("North America-Africa")][:10]
   #print "new", len(pairwise_nodes[("North America-Africa")])#, pairwise_nodes[("North America-Africa")][:10]
   #print set(pairwise_nodes[("North America-Africa")]).difference(set(pairwise_nodes_old[("North America-Africa")]))
-  return (pairwise_nodes, pairwise_links)
 
+
+def compute_y_values(nodes, links):
+  type_lists = {}
+  #print filter(lambda l: l["target"]["type"] == "required", links["Asia-Africa"])
+  for a in CONTS:
+    for b in CONTS:
+      type_lists[a + "-" + b] = {}
+      for t in ["required", "refused", "onarrival", "free"]:
+        #print "starting: " + t 
+        #print len(filter(lambda l: l["type"] == t, nodes[a + "-" + b]))
+        #print nodes[a + "-" + b]
+        type_lists[a + "-" + b][t] = filter(lambda l: l["type"] == t, nodes[a + "-" + b])
+        #print len(type_lists[a + "-" + b][t])
+        #type_lists[a + "-" + b][t]=(len(nodes[a + "-" + b].filter{"type" = t})
+        order = len(type_lists[a + "-" + b][t])
+        # print order
+        indices = {}
+        for i,x in enumerate([z["name"] for z in type_lists[a + "-" + b][t]]):
+          # print i,x
+          indices[x] = i 
+        # print len(indices)
+        map(lambda m: m.update({"y": float(indices[m["name"]]+1)/order }), filter(lambda l: l["type"] == t, nodes[a + "-" + b]))
+        #print nodes[a + "-" + b][:1000]
+        # print a, b, t, len(filter(lambda l: l["target"]["type"] == t, links[a + "-" + b]))
+        # for x in filter(lambda l: l["target"]["type"] == t, links[a + "-" + b]):
+        #   print indices[x["target"]["name"]] 
+        map(lambda s: s["target"].update({"y": float(indices[s["target"]["name"]]+1)/order}), filter(lambda l: l["target"]["type"] == t, links[a + "-" + b]))
+        #print filter(lambda l: l["target"]["type"] == t, links[a + "-" + b])
+  #print links["Asia-Africa"][:100]
+  return nodes, links
 
 
 def main(data_folder, output_key=""):
@@ -113,8 +142,10 @@ def main(data_folder, output_key=""):
   pair_dicts = create_pairwise_networks(countries, links)
   # print pair_dicts_old[1][("North America-Oceania")], len(pair_dicts_old[1][("North America-Oceania")])
   # print pair_dicts[1][("North America-Oceania")], len(pair_dicts[1][("North America-Oceania")])
-  return json.dumps({"pairwise_nodes": pair_dicts[0], "pairwise_links": pair_dicts[1]})
+  #return json.dumps({"pairwise_nodes": pair_dicts[0], "pairwise_links": pair_dicts[1]})
   #return json.dumps({"nodes": nodes, "links": links[output_key]}) 
+  u, v = compute_y_values(pair_dicts[0], pair_dicts[1])
+  return json.dumps({"pairwise_nodes": u, "pairwise_links": v})
 
 '''CL arguments are data_folder and output_key'''
 if __name__=="__main__":
