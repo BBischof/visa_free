@@ -42,7 +42,7 @@ An early mistake was showing all nodes from a continent on each status-axis. Ini
 
 ## Style Choices
 
-We chose primary colors because the number of necessary colors was small. We expanded the `origin` axis and scaled other axes to reasonably provide room for the corresponding numbers of nodes.
+We chose primary colors because the number of necessary colors was small. We scaled the axes based on the number of nodes corresponding to that target/continent combination.
 
 ## Interactions for more information
 
