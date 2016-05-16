@@ -3,6 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<title>Hive Link Plot</title>
+  <link rel="stylesheet" href="../static/bootstrap.min.css">
 	<style type="text/css">
 	.link{
 		fill: none;
@@ -34,39 +35,113 @@
   stroke-opacity: 1;
 }
 
+.container1{
+  position: absolute;
+  left: 5%;
+  top: 5%;
+}
+
+.container2{
+  position: absolute;
+  left: 5%;
+  top: 10%
+}
+
+.container3{
+  position: absolute;
+  left: 80%;
+  top: 20%;
+}
+
 	</style>
+  <script type="text/javascript" src="../static/jquery-2.2.0.min.js"></script>
+  <script src="../static/bootstrap.min.js"></script>
 </head>
 <body>
+  <div class="container1">
+  <div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="source">Source Continent
+    <span class="caret"></span></button>
+    <ul class="dropdown-menu" id="source">
+      <li><a href="#">Asia</a></li>
+      <li><a href="#">Africa</a></li>
+      <li><a href="#">Europe</a></li>
+      <li><a href="#">North America</a></li>
+      <li><a href="#">South America</a></li>
+      <li><a href="#">Central America</a></li>
+      <li><a href="#">Oceania</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="container2">
+  <div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="target">Target Continent
+    <span class="caret"></span></button>
+    <ul class="dropdown-menu" id="target">
+      <li><a href="#">Asia</a></li>
+      <li><a href="#">Africa</a></li>
+      <li><a href="#">Europe</a></li>
+      <li><a href="#">North America</a></li>
+      <li><a href="#">South America</a></li>
+      <li><a href="#">Central America</a></li>
+      <li><a href="#">Oceania</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- <div class="container3">
+  <p>Apple</p>
+</div> -->
+
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript" src="../static/d3.hive.min.js"></script>
 <script type="text/javascript">
 
-var width = 1000;
-var height = 1000;
-var outerRadius = 400;
-var innerRadius = 10;
+var source_cont = "Europe";
+var target_cont = "North America";
+
+$("#source li a").click(function(){
+  source_cont = $(this).text();
+  $("#source:first-child").text(source_cont);
+  plot(source_cont, target_cont);
+});
+
+
+
+$("#target li a").click(function(){
+  target_cont = $(this).text();
+  $("#target:first-child").text(target_cont);
+  plot(source_cont, target_cont);
+});
+
+plot(source_cont, target_cont);
+
+function plot(source_cont, target_cont){
+  d3.select("svg")
+    .remove();
+
+
+var width = 1200;
+var height = 1500;
+var outerRadius = 500;
+var innerRadius = 50;
+var minLength = 5;
 
 
 
 var visa_types = {'free': 1, 'required': 4, 'refused': 2, 'onarrival': 3, 'origin': 0};
 
 
-// var angle = d3.scale.ordinal()
-// 		.domain(d3.range(6))
-// 		.rangePoints([0,2 * Math.PI]);
-
 var angle = d3.scale.ordinal()
-    .domain(["origin", "free", "refused", "required", "onarrival"])
-    .range([0, Math.PI/2, 11 * Math.PI / 12, 3 * Math.PI / 2, 13 * Math.PI / 12]);
+    .domain(["origin", "free", "refused", "onarrival", "required"])
+    .range([0, Math.PI/2, 11 * Math.PI / 12, 13 * Math.PI / 12, 3 * Math.PI / 2]);
 
-// alert(angle(1));
+
 
 var radius = d3.scale.linear()
 		.range([innerRadius, outerRadius]);
 
-
-// var color = d3.scale.category20()
-// 		.domain(d3.range(20));
 
 
 var color = ["yellow", "blue", "red", "orange", "green"];
@@ -80,48 +155,60 @@ var svg = d3.select("body").append("svg")
 
 
 
-svg.selectAll(".axis")
-		.data(d3.range(5))
-	.enter().append("line")
-		.attr("class", "axis")
-		.attr("transform", function(d){ return "rotate(" + degrees(angle(d)) + ")";})
-    .attr("x1", radius.range()[0])
-		.attr("x2", radius.range()[1])
-    ;
+
+
+d3.json("reduced_pairwise_datasets.json", function(error, graph){
+  nodes = graph.pairwise_nodes[source_cont + "-" + target_cont];
+  links = graph.pairwise_links[source_cont + "-" + target_cont];
 
 
 
 
-d3.json("pairwise_datasets.json", function(error, graph){
-  nodes = graph.pairwise_nodes['Europe-Asia'];
-  links = graph.pairwise_links['Europe-Asia'];
 
-  // console.log(nodes[55].y);
+  var free_links = new Set(links.filter(function(p){ return p.target.type == 'free';}).map(function(d){return d.target.name}));
+  var onarrival_links = new Set(links.filter(function(p){ return p.target.type == 'onarrival';}).map(function(d){return d.target.name}));
+  var required_links = new Set(links.filter(function(p){ return p.target.type == 'required';}).map(function(d){return d.target.name}));
+  var refused_links = new Set(links.filter(function(p){ return p.target.type == 'refused';}).map(function(d){return d.target.name}));
 
-  // nodes.forEach(function(d){
-  //   console.log(d.y);
-  // })
+  
 
-
-  var free_links = links.filter(function(p){ return p.target.type == 'free';});
-  var onarrival_links = links.filter(function(p){ return p.target.type == 'onarrival';});
-  var required_links = links.filter(function(p){ return p.target.type == 'required';});
-  var refused_links = links.filter(function(p){ return p.target.type == 'refused';});
+  var visa_lengths = [{'name': 'origin', 'length': 50}, {'name': 'free', 'length': free_links.size}, {'name': 'refused', 'length': refused_links.size}, {'name': 'onarrival', 'length': onarrival_links.size}, {'name': 'required', 'length': required_links.size}];
 
 
-  var visa_lengths = [{'name': 'origin', 'length': 50}, {'name': 'free', 'length': free_links.length}, {'name': 'onarrival', 'length': onarrival_links.length}, {'name': 'required', 'length':  required_links.length}, {'name': 'refused', 'length': refused_links.length}];
+  var visa_obj = {'origin': 50, 'free': free_links.size, 'required': required_links.size, 'onarrival': onarrival_links.size, 'refused': refused_links.size}; 
+
+  // var descending_types = [(t,visa_obj[t]).sortby(2)]
+
+  radius.domain(d3.extent(visa_lengths, function(d){ return d.length; }));
 
 
-  // radius.domain(d3.extent(visa_lengths, function(d){ return d.length; }));
 
-  // svg.selectAll(".axis")
-  //     .data(visa_lengths)
-  //   .enter().append("line")
-  //     .attr("class", "axis")
-  //     .attr("transform", function(d, i){ return "rotate(" + degrees(angle(i)) + ")";})
-  //     .attr("x1", radius(-2))
-  //     .attr("x2", function(d){return radius(d.length + 2);})
-  //     ;
+  svg.selectAll(".axis")
+      .data(visa_lengths)
+    .enter().append("line")
+      .attr("class", "axis")
+      .attr("transform", function(d, i){ return "rotate(" + degrees(angle(i)) + ")";})
+      .attr("x1", radius.range()[0])
+      .attr("x2", function(d){return radius(d.length);})
+      // .append("text")
+      // .attr("class", "label")
+      // .attr("transform", function(d, i){ return "rotate(" + degrees(angle(i)) + ")";})
+      // .attr("x", function(d){return radius(d.length) + 60;})
+      // // .attr("y", function(d){return radius(d.length);})
+      // .attr("dy", ".35em")
+      // .style("text-anchor", "end")
+      // .style("font", "10px sans-serif")
+      // .text("apple")
+      ;
+
+  // svg.selectAll(".axis").append("text")
+  //   .attr("class", "label")
+  //   .attr("x", 200)
+  //   .attr("y", 200)
+  //   // .attr("transform", "rotate(-180)")
+  //   .style("font", "10px sans-serif")
+  //   .style("fill", "blue")
+  //   .text("alpha");
 
 
 
@@ -131,12 +218,12 @@ d3.json("pairwise_datasets.json", function(error, graph){
       .attr("class", "link")
       .attr("d", d3.hive.link()
       .angle(function(d) { return angle(visa_types[d.type]); })
-      .radius(function(d) { return radius(d.y); }))
+      .radius(function(d) { return radius(visa_obj[d.type] * d.y); }))
       .style("stroke", function(d) { return color[visa_types[d.target.type]]; })
       .on("mouseover", linkMouseover)
       .on("mouseout", mouseout)
       .append("title")
-      .text(function(d){ return d.source.name + ' --> ' + d.target.name})
+      .text(function(d){ return d.source.name + ' --> ' + d.target.name + ' : ' + d.target.type})
       ;
 
 
@@ -146,9 +233,10 @@ d3.json("pairwise_datasets.json", function(error, graph){
     .enter().append("circle")
       .attr("class", "node")
       .attr("transform", function(d) { return "rotate(" + degrees(angle(visa_types[d.type])) + ")"; })
-      .attr("cx", function(d) { return radius(d.y); })
+      .attr("cx", function(d) { return radius(visa_obj[d.type] * d.y); })
       .attr("r", 5)
       .style("fill", function(d) { return color[visa_types[d.type]]; })
+      .on("click", nodeClick)
       .on("mouseover", nodeMouseover)
       .on("mouseout", mouseout)
       .append("title")
@@ -170,6 +258,20 @@ d3.json("pairwise_datasets.json", function(error, graph){
   }
 
 
+  function nodeClick(d){
+    var relavant_nodes = {'free': [], 'onarrival':[], 'required': [], 'refused':[]};
+    links.forEach(function(p){
+      if (p.source.name == d.name){
+        relavant_nodes[p.target.type].push(p.target.name)
+      }
+    })
+    for (key in relavant_nodes){
+      console.log(key);
+      console.log(relavant_nodes[key]);
+    }
+  }
+
+
 
   // Clear any highlighted nodes or links.
   function mouseout() {
@@ -177,6 +279,7 @@ d3.json("pairwise_datasets.json", function(error, graph){
   }
 
   });
+}
 
 function degrees(radians) {
   return radians / Math.PI * 180 - 90;
