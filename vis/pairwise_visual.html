@@ -68,7 +68,7 @@
       <li><a href="#">Europe</a></li>
       <li><a href="#">North America</a></li>
       <li><a href="#">South America</a></li>
-      <li><a href="#">Central America</a></li>
+      <li><a href="#">Central America and the Antilles</a></li>
       <li><a href="#">Oceania</a></li>
     </ul>
   </div>
@@ -84,7 +84,7 @@
       <li><a href="#">Europe</a></li>
       <li><a href="#">North America</a></li>
       <li><a href="#">South America</a></li>
-      <li><a href="#">Central America</a></li>
+      <li><a href="#">Central America and the Antilles</a></li>
       <li><a href="#">Oceania</a></li>
     </ul>
   </div>
@@ -95,6 +95,7 @@
 </div> -->
 
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.10.0/d3-legend.js"></script>
 <script type="text/javascript" src="../static/d3.hive.min.js"></script>
 <script type="text/javascript">
 
@@ -123,7 +124,7 @@ function plot(source_cont, target_cont){
 
 
 var width = 1200;
-var height = 1500;
+var height = 1200;
 var outerRadius = 500;
 var innerRadius = 50;
 var minLength = 5;
@@ -144,7 +145,9 @@ var radius = d3.scale.linear()
 
 
 
-var color = ["yellow", "blue", "red", "orange", "green"];
+var color = d3.scale.ordinal()
+    .domain(["origin", "free", "refused", "onarrival", "required"])
+    .range(["yellow", "blue", "red", "orange", "green"]);
 
 
 var svg = d3.select("body").append("svg")
@@ -153,7 +156,15 @@ var svg = d3.select("body").append("svg")
 	.append("g")
 		.attr("transform", "translate(" + width/2 + "," + height/2 + ")");
 
+svg.append("g")
+    .attr("class", "legendOrdinal")
+    .attr("transform", "translate(-530, -400)");
 
+var legendOrdinal = d3.legend.color()
+    .scale(color);
+
+// svg.select(".legendOrdinal")
+//   .call(legendOrdinal);
 
 
 
@@ -190,15 +201,6 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
       .attr("transform", function(d, i){ return "rotate(" + degrees(angle(i)) + ")";})
       .attr("x1", radius.range()[0])
       .attr("x2", function(d){return radius(d.length);})
-      // .append("text")
-      // .attr("class", "label")
-      // .attr("transform", function(d, i){ return "rotate(" + degrees(angle(i)) + ")";})
-      // .attr("x", function(d){return radius(d.length) + 60;})
-      // // .attr("y", function(d){return radius(d.length);})
-      // .attr("dy", ".35em")
-      // .style("text-anchor", "end")
-      // .style("font", "10px sans-serif")
-      // .text("apple")
       ;
 
   // svg.selectAll(".axis").append("text")
@@ -219,7 +221,7 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
       .attr("d", d3.hive.link()
       .angle(function(d) { return angle(visa_types[d.type]); })
       .radius(function(d) { return radius(visa_obj[d.type] * d.y); }))
-      .style("stroke", function(d) { return color[visa_types[d.target.type]]; })
+      .style("stroke", function(d) { return color(d.target.type);})
       .on("mouseover", linkMouseover)
       .on("mouseout", mouseout)
       .append("title")
@@ -235,13 +237,20 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
       .attr("transform", function(d) { return "rotate(" + degrees(angle(visa_types[d.type])) + ")"; })
       .attr("cx", function(d) { return radius(visa_obj[d.type] * d.y); })
       .attr("r", 5)
-      .style("fill", function(d) { return color[visa_types[d.type]]; })
+      .style("fill", function(d) { return color(d.type);})
       .on("click", nodeClick)
       .on("mouseover", nodeMouseover)
       .on("mouseout", mouseout)
       .append("title")
       .text(function(d){ return d.name; })
       ;
+
+
+  var legendOrdinal = d3.legend.color()
+    .scale(color);
+
+  svg.select(".legendOrdinal")
+    .call(legendOrdinal);
 
 
   function linkMouseover(d) {

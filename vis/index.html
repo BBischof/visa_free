@@ -38,6 +38,7 @@
 </head>
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.10.0/d3-legend.js"></script>
 <script type="text/javascript" src="../static/d3.hive.min.js"></script>
 <script type="text/javascript">
 
@@ -61,7 +62,7 @@ var radius = d3.scale.linear()
 
 
 var color = d3.scale.category20()
-		.domain(d3.range(20));
+    .domain(["Asia", "Africa", "North America", "Europe", "South America", "Central America and the Antilles", "Oceania"]);
 
 
 
@@ -80,6 +81,17 @@ svg.selectAll(".axis")
 		.attr("transform", function(d){ return "rotate(" + degrees(angle(d)) + ")";})
     .attr("x1", radius.range()[0])
 		.attr("x2", radius.range()[1]);
+
+
+svg.append("g")
+    .attr("class", "legendOrdinal")
+    .attr("transform", "translate(500, -200)");
+
+var legendOrdinal = d3.legend.color()
+    .scale(color);
+
+svg.select(".legendOrdinal")
+  .call(legendOrdinal);
 
 
 
@@ -119,6 +131,7 @@ d3.json("visa_refused1.json", function(error, graph){
       .append("title")
       .text(function(d){ return d.name; })
       ;
+
 
 
   function linkMouseover(d) {
