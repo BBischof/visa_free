@@ -8,8 +8,8 @@
 	.link{
 		fill: none;
     stroke: #000;
-		stroke-width: 1.5px;
-    stroke-opacity: .2;
+		stroke-width: 1px;
+    stroke-opacity: .1;
 	}
 
 
@@ -44,14 +44,25 @@
 .container2{
   position: absolute;
   left: 5%;
-  top: 10%
+  top: 12%
 }
 
 .container3{
   position: absolute;
   left: 80%;
   top: 20%;
+  font: 15px;
 }
+
+.container3 .parentP{
+  color: red;
+}
+
+.container3 .childP{
+  color: steelblue;
+}
+
+
 
 	</style>
   <script type="text/javascript" src="../static/jquery-2.2.0.min.js"></script>
@@ -60,7 +71,7 @@
 <body>
   <div class="container1">
   <div class="dropdown">
-    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="source">Source Continent
+    Source Continent  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="source">Europe
     <span class="caret"></span></button>
     <ul class="dropdown-menu" id="source">
       <li><a href="#">Asia</a></li>
@@ -76,7 +87,7 @@
 
 <div class="container2">
   <div class="dropdown">
-    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="target">Target Continent
+    Target Continent  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="target">North America
     <span class="caret"></span></button>
     <ul class="dropdown-menu" id="target">
       <li><a href="#">Asia</a></li>
@@ -90,9 +101,8 @@
   </div>
 </div>
 
-<!-- <div class="container3">
-  <p>Apple</p>
-</div> -->
+<div class="container3">
+</div>
 
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.10.0/d3-legend.js"></script>
@@ -163,8 +173,6 @@ svg.append("g")
 var legendOrdinal = d3.legend.color()
     .scale(color);
 
-// svg.select(".legendOrdinal")
-//   .call(legendOrdinal);
 
 
 
@@ -175,6 +183,7 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
 
 
 
+  // var origin_links = 
 
   var free_links = new Set(links.filter(function(p){ return p.target.type == 'free';}).map(function(d){return d.target.name}));
   var onarrival_links = new Set(links.filter(function(p){ return p.target.type == 'onarrival';}).map(function(d){return d.target.name}));
@@ -225,7 +234,9 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
       .on("mouseover", linkMouseover)
       .on("mouseout", mouseout)
       .append("title")
-      .text(function(d){ return d.source.name + ' --> ' + d.target.name + ' : ' + d.target.type})
+      .text(function(d){ return d.source.name + ' --> ' + d.target.name 
+        // + ' : ' + d.target.type
+      })
       ;
 
 
@@ -243,6 +254,7 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
       .on("mouseout", mouseout)
       .append("title")
       .text(function(d){ return d.name; })
+      // .style("fill", "blue")
       ;
 
 
@@ -274,9 +286,22 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
         relavant_nodes[p.target.type].push(p.target.name)
       }
     })
+    
+
+    var side_panel = d3.select('.container3');
+    side_panel.html("");
+    side_panel.html('<strong>Country: </strong>' + d.name + '<br></br>');
     for (key in relavant_nodes){
-      console.log(key);
-      console.log(relavant_nodes[key]);
+      if (relavant_nodes[key].length != 0){
+      var key_item = side_panel.append("p")
+        .attr("class", "parentP")
+        .html('<strong>Visa ' + key.toUpperCase() + '</strong>');
+      relavant_nodes[key].forEach(function(d){
+        side_panel.append("p")
+          .attr("class", "childP")
+          .html(d);
+      })
+    }
     }
   }
 
