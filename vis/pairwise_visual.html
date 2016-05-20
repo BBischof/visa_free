@@ -136,8 +136,14 @@ function plot(source_cont, target_cont){
 var width = 1200;
 var height = 1200;
 var outerRadius = 500;
-var innerRadius = 200;
+var innerRadius = 50;
 var minLength = 5;
+
+if ((source_cont == 'Asia') && (target_cont == 'Asia')){
+  innerRadius = 160;
+} else if (target_cont == 'Africa'){
+  innerRadius = 70;
+}
 
 
 
