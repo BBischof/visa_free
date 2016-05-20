@@ -52,7 +52,7 @@ function plot(source_cont, target_cont){
 var width = 1200;
 var height = 1200;
 var outerRadius = 500;
-var innerRadius = 50;
+var innerRadius = 200;
 var minLength = 5;
 
 
@@ -105,7 +105,10 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
   var visa_lengths = [{'name': 'origin', 'length': 50}, {'name': 'free', 'length': free_links.size}, {'name': 'refused', 'length': refused_links.size}, {'name': 'onarrival', 'length': onarrival_links.size}, {'name': 'required', 'length': required_links.size}];
 
 
+
   var visa_obj = {'origin': 55, 'free': free_links.size, 'required': required_links.size, 'onarrival': onarrival_links.size, 'refused': refused_links.size}; 
+
+  alert(visa_obj.required);
 
 
 
@@ -145,6 +148,9 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
       .attr("cx", function(d) { return radius(visa_obj[d.type] * d.y); })
       .attr("r", 5)
       .style("fill", function(d) { return color(d.type);})
+      .on("click", function(d){
+        console.log(d.y);
+      })
       ;
 
 
