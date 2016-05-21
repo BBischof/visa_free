@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<title>Hive Link Plot</title>
-  <link rel="stylesheet" href="../static/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 	<style type="text/css">
 	.link{
 		fill: none;
@@ -11,64 +11,67 @@
 		stroke-width: 1px;
     stroke-opacity: .1;
 	}
-
-
 	.axis {
 		stroke: #000;
 		stroke-width: 1.5px;
 	}
-
-
-
 .link.active {
   stroke-width: 3px;
   stroke-opacity: 1;
 }
-
 .node {
   stroke: #000;
 }
-
 .node.active {
   stroke: red;
   stroke-width: 3px;
   stroke-opacity: 1;
 }
-
 .container1{
   position: absolute;
-  left: 5%;
-  top: 5%;
+  left: 1%;
+  top: 20%;
 }
-
 .container2{
   position: absolute;
-  left: 5%;
-  top: 12%
+  left: 1%;
+  top: 27%
 }
-
 .container3{
   position: absolute;
-  left: 80%;
+  left: 85%;
   top: 20%;
   font: 15px;
 }
-
 .container3 .parentP{
   color: red;
 }
-
 .container3 .childP{
   color: steelblue;
 }
-
-
+.header{
+  width: 1400px;
+  height: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #5d6d7e;
+  color: white;
+  font: 30px palatino;
+}
+.head-txt{
+  position: absolute;
+  left: 20%;
+  top: 5%;
+}
 
 	</style>
-  <script type="text/javascript" src="../static/jquery-2.2.0.min.js"></script>
-  <script src="../static/bootstrap.min.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 </head>
 <body>
+  <header class="header">
+    <p class="head-txt">International Travel Visa Topology — Hive Plot Visualization</p>
+  </header>
   <div class="container1">
   <div class="dropdown">
     Source Continent  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="source">Europe
@@ -118,8 +121,6 @@ $("#source li a").click(function(){
   plot(source_cont, target_cont);
 });
 
-
-
 $("#target li a").click(function(){
   target_cont = $(this).text();
   $("#target:first-child").text(target_cont);
@@ -131,8 +132,6 @@ plot(source_cont, target_cont);
 function plot(source_cont, target_cont){
   d3.select("svg")
     .remove();
-
-
 var width = 1200;
 var height = 1200;
 var outerRadius = 500;
@@ -145,69 +144,40 @@ if ((source_cont == 'Asia') && (target_cont == 'Asia')){
   innerRadius = 70;
 }
 
-
-
 var visa_types = {'free': 1, 'required': 4, 'refused': 2, 'onarrival': 3, 'origin': 0};
-
-
 var angle = d3.scale.ordinal()
     .domain(["origin", "free", "refused", "onarrival", "required"])
     .range([0, Math.PI/2, 11 * Math.PI / 12, 13 * Math.PI / 12, 3 * Math.PI / 2]);
-
-
-
 var radius = d3.scale.linear()
 		.range([innerRadius, outerRadius]);
-
-
-
 var color = d3.scale.ordinal()
     .domain(["origin", "free", "refused", "onarrival", "required"])
     .range(["yellow", "blue", "red", "orange", "green"]);
-
-
 var svg = d3.select("body").append("svg")
+    .attr("class", "svg")
 		.attr("width", width)
 		.attr("height", height)
 	.append("g")
-		.attr("transform", "translate(" + width/2 + "," + height/2 + ")");
-
+		.attr("transform", "translate(" + width/2 + "," + height/1.9 + ")");
 svg.append("g")
     .attr("class", "legendOrdinal")
-    .attr("transform", "translate(-530, -400)");
-
+    .attr("transform", "translate(-550, -420)");
 var legendOrdinal = d3.legend.color()
     .scale(color);
-
-
-
 
 d3.json("reduced_pairwise_datasets.json", function(error, graph){
   nodes = graph.pairwise_nodes[source_cont + "-" + target_cont];
   links = graph.pairwise_links[source_cont + "-" + target_cont];
-
-
-
-
-  // var origin_links = 
-
   var free_links = new Set(links.filter(function(p){ return p.target.type == 'free';}).map(function(d){return d.target.name}));
   var onarrival_links = new Set(links.filter(function(p){ return p.target.type == 'onarrival';}).map(function(d){return d.target.name}));
   var required_links = new Set(links.filter(function(p){ return p.target.type == 'required';}).map(function(d){return d.target.name}));
   var refused_links = new Set(links.filter(function(p){ return p.target.type == 'refused';}).map(function(d){return d.target.name}));
 
-  
-
   var visa_lengths = [{'name': 'origin', 'length': 50}, {'name': 'free', 'length': free_links.size}, {'name': 'refused', 'length': refused_links.size}, {'name': 'onarrival', 'length': onarrival_links.size}, {'name': 'required', 'length': required_links.size}];
-
 
   var visa_obj = {'origin': 55, 'free': free_links.size, 'required': required_links.size, 'onarrival': onarrival_links.size, 'refused': refused_links.size}; 
 
-  // var descending_types = [(t,visa_obj[t]).sortby(2)]
-
   radius.domain(d3.extent(visa_lengths, function(d){ return d.length; }));
-
-
 
   svg.selectAll(".axis")
       .data(visa_lengths)
@@ -217,18 +187,6 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
       .attr("x1", radius.range()[0])
       .attr("x2", function(d){return radius(d.length);})
       ;
-
-  // svg.selectAll(".axis").append("text")
-  //   .attr("class", "label")
-  //   .attr("x", 200)
-  //   .attr("y", 200)
-  //   // .attr("transform", "rotate(-180)")
-  //   .style("font", "10px sans-serif")
-  //   .style("fill", "blue")
-  //   .text("alpha");
-
-
-
   svg.selectAll(".link")
       .data(links)
     .enter().append("path")
@@ -241,12 +199,8 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
       .on("mouseout", mouseout)
       .append("title")
       .text(function(d){ return d.source.name + ' --> ' + d.target.name 
-        // + ' : ' + d.target.type
       })
       ;
-
-
-
   svg.selectAll(".node")
       .data(nodes)
     .enter().append("circle")
@@ -260,30 +214,21 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
       .on("mouseout", mouseout)
       .append("title")
       .text(function(d){ return d.name; })
-      // .style("fill", "blue")
       ;
-
-
   var legendOrdinal = d3.legend.color()
     .scale(color);
-
   svg.select(".legendOrdinal")
     .call(legendOrdinal);
-
 
   function linkMouseover(d) {
     svg.selectAll(".link").classed("active", function(p) { return p === d; });
     svg.selectAll(".node").classed("active", function(x) { return x.name === d.source.name || x.name === d.target.name; });
   }
 
-
-
-  // Highlight the node and connected links on mouseover.
   function nodeMouseover(d) {
-    svg.selectAll(".link").classed("active", function(p) { return p.source.name === d.name || p.target.name === d.name; });
+    svg.selectAll(".link").classed("active", function(p) { return (p.source.name === d.name && p.source.type == d.type) || (p.target.name === d.name && p.target.type == d.type); });
     d3.select(this).classed("active", true);
   }
-
 
   function nodeClick(d){
     var relavant_nodes = {'free': [], 'onarrival':[], 'required': [], 'refused':[]};
@@ -292,8 +237,6 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
         relavant_nodes[p.target.type].push(p.target.name)
       }
     })
-    
-
     var side_panel = d3.select('.container3');
     side_panel.html("");
     side_panel.html('<strong>Country: </strong>' + d.name + '<br></br>');
@@ -311,9 +254,6 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
     }
   }
 
-
-
-  // Clear any highlighted nodes or links.
   function mouseout() {
     svg.selectAll(".active").classed("active", false);
   }
@@ -324,11 +264,6 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
 function degrees(radians) {
   return radians / Math.PI * 180 - 90;
 }
-
-
-
-
-
 
 </script>
 
