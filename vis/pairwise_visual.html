@@ -132,7 +132,7 @@ $("#target li a").click(function(){
   sidePane.html("")
   sidePane.selectAll("p")
     .remove()
-    
+
   target_cont = $(this).text();
   $("#target:first-child").text(target_cont);
   plot(source_cont, target_cont);
@@ -173,7 +173,7 @@ var svg = d3.select("body").append("svg")
 
 svg.append("g")
     .attr("class", "legendOrdinal")
-    .attr("transform", "translate(-590, -420)");
+    .attr("transform", "translate(-590, -220)");
 var legendOrdinal = d3.legend.color()
     .scale(color);
 
