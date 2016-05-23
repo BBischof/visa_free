@@ -117,16 +117,22 @@ var source_cont = "Europe";
 var target_cont = "North America";
 
 $("#source li a").click(function(){
-  d3.select(".container3")
+  var sidePane = d3.select(".container3")
+  sidePane.html("")
+  sidePane.selectAll("p")
     .remove()
   source_cont = $(this).text();
   $("#source:first-child").text(source_cont);
   plot(source_cont, target_cont);
 });
 
+
 $("#target li a").click(function(){
-  d3.select(".container3")
+  var sidePane = d3.select(".container3")
+  sidePane.html("")
+  sidePane.selectAll("p")
     .remove()
+    
   target_cont = $(this).text();
   $("#target:first-child").text(target_cont);
   plot(source_cont, target_cont);
@@ -179,7 +185,7 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
   var required_links = new Set(links.filter(function(p){ return p.target.type == 'required';}).map(function(d){return d.target.name}));
   var refused_links = new Set(links.filter(function(p){ return p.target.type == 'refused';}).map(function(d){return d.target.name}));
 
-  var visa_lengths = [{'name': 'origin', 'length': 50}, {'name': 'free', 'length': free_links.size}, {'name': 'refused', 'length': refused_links.size}, {'name': 'onarrival', 'length': onarrival_links.size}, {'name': 'required', 'length': required_links.size}];
+  var visa_lengths = [{'name': 'origin', 'length': 55}, {'name': 'free', 'length': free_links.size}, {'name': 'refused', 'length': refused_links.size}, {'name': 'onarrival', 'length': onarrival_links.size}, {'name': 'required', 'length': required_links.size}];
 
   var visa_obj = {'origin': 55, 'free': free_links.size, 'required': required_links.size, 'onarrival': onarrival_links.size, 'refused': refused_links.size}; 
 
