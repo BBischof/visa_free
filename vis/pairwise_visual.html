@@ -29,12 +29,12 @@
 }
 .container1{
   position: absolute;
-  left: 1%;
+  left: 0%;
   top: 20%;
 }
 .container2{
   position: absolute;
-  left: 1%;
+  left: 0%;
   top: 27%
 }
 .container3{
@@ -48,6 +48,7 @@
 }
 .container3 .childP{
   color: steelblue;
+  line-height: 70%;
 }
 .header{
   width: 1400px;
@@ -74,7 +75,7 @@
   </header>
   <div class="container1">
   <div class="dropdown">
-    Source Continent  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="source">Europe
+    Source Continent:  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="source">Europe
     <span class="caret"></span></button>
     <ul class="dropdown-menu" id="source">
       <li><a href="#">Asia</a></li>
@@ -90,7 +91,7 @@
 
 <div class="container2">
   <div class="dropdown">
-    Target Continent  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="target">North America
+    Target Continent:  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="target">North America
     <span class="caret"></span></button>
     <ul class="dropdown-menu" id="target">
       <li><a href="#">Asia</a></li>
@@ -116,12 +117,16 @@ var source_cont = "Europe";
 var target_cont = "North America";
 
 $("#source li a").click(function(){
+  d3.select(".container3")
+    .remove()
   source_cont = $(this).text();
   $("#source:first-child").text(source_cont);
   plot(source_cont, target_cont);
 });
 
 $("#target li a").click(function(){
+  d3.select(".container3")
+    .remove()
   target_cont = $(this).text();
   $("#target:first-child").text(target_cont);
   plot(source_cont, target_cont);
@@ -159,9 +164,10 @@ var svg = d3.select("body").append("svg")
 		.attr("height", height)
 	.append("g")
 		.attr("transform", "translate(" + width/2 + "," + height/1.9 + ")");
+
 svg.append("g")
     .attr("class", "legendOrdinal")
-    .attr("transform", "translate(-550, -420)");
+    .attr("transform", "translate(-590, -420)");
 var legendOrdinal = d3.legend.color()
     .scale(color);
 
