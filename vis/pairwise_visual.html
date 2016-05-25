@@ -5,6 +5,23 @@
 	<title>Hive Link Plot</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 	<style type="text/css">
+body {
+	height: 100vh;
+	overflow: hidden;
+}
+.hpanel {
+	display: flex;
+}
+.hpanel-main {
+	flex: 1;
+}
+.vpanel {
+	display: flex;
+	flex-direction: column;
+}
+.vpanel-main {
+	flex: 1;
+}
 	.link{
 		fill: none;
     stroke: #000;
@@ -29,21 +46,20 @@
 }
 .container1{
   padding-top: 10px;
-  position: relative;
-  left: 0%;
-  top: 20%;
-}
-.container2{
-  position: absolute;
-  left: 0%;
-  top: 27%
+  padding-bottom: 10px;
 }
 .container3{
-  z-index: 2000000;
-  position: absolute;
-  left: 85%;
-  top: 20%;
-  font: 15px;
+	width: 400px;
+	background-color: pink;
+	overflow-y: auto;
+}
+#visualization {
+	min-width: 1100px;
+	overflow-y: auto;
+}
+#visualization > svg {
+	display: block;
+	margin-left: 0 auto;
 }
 .source{
   padding-bottom: 5px;
@@ -56,30 +72,23 @@
   line-height: 70%;
 }
 .header{
-  width: 1400px;
-  height: 100px;
-  margin-left: auto;
-  margin-right: auto;
+  text-align: center;
+  padding-top: 33px;
+  padding-bottom: 33px;
   background-color: #5d6d7e;
   color: white;
   font: 30px palatino;
 }
-.head-txt{
-  position: absolute;
-  left: 20%;
-  top: 5%;
-}
 .plain-text{
   padding-top: 6px;
 }
-
 	</style>
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 </head>
-<body>
+<body class="vpanel">
   <header class="header">
-    <p class="head-txt">International Travel Visa Topology — Hive Plot Visualization</p>
+    International Travel Visa Topology — Hive Plot Visualization
   </header>
    <div class="container1 container">
     <div class="source row">
@@ -112,9 +121,12 @@
       </div>
     </div>
   </div>
-
-<div class="container3">
-</div>
+	<div class="vpanel-main hpanel">
+		<div class="hpanel-main" id="visualization">
+		</div>
+		<div class="container3">
+		</div>
+	</div>
 
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.10.0/d3-legend.js"></script>
@@ -151,8 +163,8 @@ plot(source_cont, target_cont);
 function plot(source_cont, target_cont){
   d3.select("svg")
     .remove();
-var width = 1200;
-var height = 1200;
+var width = 1100;
+var height = 1100;
 var outerRadius = 500;
 var innerRadius = 50;
 var minLength = 5;
@@ -172,12 +184,12 @@ var radius = d3.scale.linear()
 var color = d3.scale.ordinal()
     .domain(["origin", "free", "refused", "onarrival", "required"])
     .range(["yellow", "blue", "red", "orange", "green"]);
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#visualization").append("svg")
     .attr("class", "svg")
 		.attr("width", width)
 		.attr("height", height)
 	.append("g")
-		.attr("transform", "translate(" + width/2.35 + "," + height/2.3 + ")");
+		.attr("transform", "translate(" + width/2 + "," + height/2 + ")");
 
 svg.append("g")
     .attr("class", "legendOrdinal")
@@ -195,7 +207,7 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
 
   var visa_lengths = [{'name': 'origin', 'length': 55}, {'name': 'free', 'length': free_links.size}, {'name': 'refused', 'length': refused_links.size}, {'name': 'onarrival', 'length': onarrival_links.size}, {'name': 'required', 'length': required_links.size}];
 
-  var visa_obj = {'origin': 55, 'free': free_links.size, 'required': required_links.size, 'onarrival': onarrival_links.size, 'refused': refused_links.size}; 
+  var visa_obj = {'origin': 55, 'free': free_links.size, 'required': required_links.size, 'onarrival': onarrival_links.size, 'refused': refused_links.size};
 
   radius.domain(d3.extent(visa_lengths, function(d){ return d.length; }));
 
@@ -218,7 +230,7 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
       .on("mouseover", linkMouseover)
       .on("mouseout", mouseout)
       .append("title")
-      .text(function(d){ return d.source.name + ' --> ' + d.target.name 
+      .text(function(d){ return d.source.name + ' --> ' + d.target.name
       })
       ;
   svg.selectAll(".node")
