@@ -2,7 +2,7 @@
 
 Leaping off from the point of "visualizing the networks between countries and continents imposed by visa status", one can imagine multitudes of visualizations: force-layout, Sankey-diagram, sunburst, etc. One that jumped out as a possibly interesting approach was a hive-plot.
 
-One immediate advantage to the hive plot, is the way it both naturally handles grouping, but shows all of the edges and spreads them out. In our case, we do have a natural clustering on nodes(the countries) given by continents. Next, one observes that there are four statuses that a visa between two countries can take: `free, on-arrival, required, refused`. One can imagine that `free` means that no visa is required, `on-arrival` means that no prior arrangements are needed, `required` means that one must arrange ahead of time, and `refused` is, well, a special designation when a passport is not permitted entry to a country or territory. One might immediately guess that a hive plot with seven "arms" corresponding to seven continents(we seprate Central America into its own, but exclude Antarctica), and colored edges to represent the four statuses. However, let's take a minute to compute:
+One immediate advantage to the hive plot, is the way that it naturally handles grouping, but shows all of the edges and spreads them out. In our case, we do have a natural clustering on nodes(the countries) given by continents. Next, one observes that there are four statuses that a visa between two countries can take: `free, on-arrival, required, refused`. One can imagine that `free` means that no visa is required, `on-arrival` means that no prior arrangements are needed, `required` means that one must arrange ahead of time, and `refused` is, well, a special designation when a passport is not permitted entry to a country or territory. One might immediately guess that a hive plot with seven "arms" corresponding to seven continents(we seprate Central America into its own, but exclude Antarctica), and colored edges to represent the four statuses. However, let's take a minute to compute:
 
 ```
 222^2=49284
@@ -34,7 +34,7 @@ We implemented a method to compair every pair of countries in a continent to fin
 
 ### Cliques and sub-networks
 
-One might guess that groups of countries would create a kind of sub-network of 'free' visas. While this is true to a certain extent, it doesn't fit with our general data model, and doesn't show information about all countries. It is, however, interesting as a supplment.
+One might guess that groups of countries would create a kind of sub-network of 'free' visas. While this is true to a certain extent, it doesn't fit with our general data model, and doesn't show information about all countries. It is, however, interesting as a supplement.
 
 ### All nodes per axis
 

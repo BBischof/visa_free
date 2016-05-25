@@ -264,7 +264,7 @@ d3.json("reduced_pairwise_datasets.json", function(error, graph){
       if (relavant_nodes[key].length != 0){
       var key_item = side_panel.append("p")
         .attr("class", "parentP")
-        .html('<strong>Visa ' + key.toUpperCase() + '</strong>');
+        .html('<strong>Visa ' + key.toUpperCase() + ":" + '</strong>');
       relavant_nodes[key].forEach(function(d){
         side_panel.append("p")
           .attr("class", "childP")
