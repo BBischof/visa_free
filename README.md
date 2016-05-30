@@ -1,5 +1,15 @@
 # VISA-Free
 
+Any traveler on the doorstep of an upcoming international trip has a variety of questions to consider, but one, is perhaps the most obvious 
+
+_"Do I need any visas?"_
+
+There are plenty of tools available to answer this simple question, and by no means is any hard work necessary to design a good user interaction to do so. Most obviously, a simple webpage is going to serve the pupose very well(one such is [here](http://www.doyouneedvisa.com/), incidentally where we scraped our data from). But instead, as an amusement, one may want to look at a more aggregate picture; what passports allow for mostly free travel; what countries exist in smaller groups of mostly free exchange; and what are some destinations that require nearly everyone to have visas to enter? These questions are of a type related to _connectivity_. 
+
+As a brief reminder, understanding the geometry associated to _connection_ lies in the realm of topology. Finding an asthetic for viewing this topology is the main purpose of the below. Note that the data is freely available, and the insights presented can be classified as novelties, but the exercise serves as edifying and useful practice in a family of problems that appears frequently. 
+
+## Visualizing the topology
+
 Leaping off from the point of "visualizing the networks between countries and continents imposed by visa status", one can imagine multitudes of visualizations: force-layout, Sankey-diagram, sunburst, etc. One that jumped out as a possibly interesting approach was a hive-plot.
 
 One immediate advantage to the hive plot, is the way that it naturally handles grouping, but shows all of the edges and spreads them out. In our case, we do have a natural clustering on nodes(the countries) given by continents. Next, one observes that there are four statuses that a visa between two countries can take: `free, on-arrival, required, refused`. One can imagine that `free` means that no visa is required, `on-arrival` means that no prior arrangements are needed, `required` means that one must arrange ahead of time, and `refused` is, well, a special designation when a passport is not permitted entry to a country or territory. One might immediately guess that a hive plot with seven "arms" corresponding to seven continents(we seprate Central America into its own, but exclude Antarctica), and colored edges to represent the four statuses. However, let's take a minute to compute:
