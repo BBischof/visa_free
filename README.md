@@ -8,6 +8,10 @@ There are plenty of tools available to answer this simple question, and by no me
 
 As a brief reminder, understanding the geometry associated to _connection_ lies in the realm of topology. Finding an asthetic for viewing this topology is the main purpose of the below. Note that the data is freely available, and the insights presented can be classified as novelties, but the exercise serves as edifying and useful practice in a family of problems that appears frequently. 
 
+## Previous work
+
+We found the paper by [Saeedian and Jamali et. al.](http://arxiv.org/pdf/1601.06314v1.pdf) interesting and inspirational.
+
 ## Visualizing the topology
 
 Leaping off from the point of "visualizing the networks between countries and continents imposed by visa status", one can imagine multitudes of visualizations: force-layout, Sankey-diagram, sunburst, etc. One that jumped out as a possibly interesting approach was a hive-plot.
