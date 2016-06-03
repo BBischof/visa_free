@@ -83,7 +83,21 @@ def create_pairwise_networks(nodes, links):
   #print len(pairwise_nodes[("North America-Africa")])#, pairwise_nodes[("North America-Africa")][:10]
   return (pairwise_nodes, pairwise_links)
 
-
+def find_reciprocal_network(links, status):
+  couples = {}
+  for x in links[status]:
+    if (x["source"]["name"]+"-"+x["target"]["name"]) in couples.keys():
+      couples[x["source"]["name"]+"-"+x["target"]["name"]] += 1
+      couples[x["target"]["name"]+"-"+x["source"]["name"]] += 1
+    else:
+      couples[x["source"]["name"]+"-"+x["target"]["name"]] = 1
+      couples[x["target"]["name"]+"-"+x["source"]["name"]] = 1
+  network = sorted(list(set(["-".join(sorted(y.split("-"))) for y in couples.keys() if couples[y] == 2])))
+  return sorted([(c, len([n for n in network if (c in n)])) 
+    for c in sorted(list(set([y.split("-")[0] 
+      for y in couples.keys() if couples[y] == 2]))
+    )
+  ], key=lambda x: x[1], reverse=True)
 
 def main(data_folder, output_key=""):
   nodes = []
@@ -96,6 +110,9 @@ def main(data_folder, output_key=""):
     out = parse_lines_into_links("output_data/" + f, countries)
     for s in links:
       links[s] += out[s]
+  #print len(links["free"])
+  for t in find_reciprocal_network(links, "free"):
+    print t
   pair_dicts = create_pairwise_networks(countries, links)
   # print pair_dicts[1][("North America-Oceania")], len(pair_dicts[1][("North America-Oceania")])
   return json.dumps({"pairwise_nodes": pair_dicts[0], "pairwise_links": pair_dicts[1]})
@@ -103,5 +120,5 @@ def main(data_folder, output_key=""):
 
 '''CL arguments are data_folder and output_key'''
 if __name__=="__main__":
-  print main(sys.argv[1], sys.argv[2])
+  main(sys.argv[1])
   # print create_continents_dictionary()
