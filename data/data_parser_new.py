@@ -1,6 +1,12 @@
 import sys, re, os, json
+import networkx as nx
+import matplotlib.pyplot as plt
 
 CONTS = {"Africa" : ["Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cameroon", "Cape Verde", "Central African Republic", "Chad", "Comoros", "Cote dIvoire", "Democratic Republic of the Congo", "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Kenya", "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia", "Niger", "Nigeria", "Republic of the Congo", "Rwanda", "Sao Tome and Principe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Sudan", "Swaziland", "Tanzania", "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe"], "Asia" : ["Afghanistan", "Armenia", "Azerbaijan", "Bahrain", "Bangladesh", "Bhutan", "Brunei", "Cambodia", "East Timor", "French Polynesia", "Guam", "Hong Kong", "India", "Indonesia", "Iran", "Iraq", "Israel", "Japan", "Jordan", "Kazakhstan", "Kuwait", "Kyrgyzstan", "Laos", "Lebanon", "Macau", "Malaysia", "Maldives", "Mongolia", "Myanmar", "Nepal", "North Korea", "Northern Mariana Islands", "Oman", "Pakistan", "Palestine", "Peoples Republic of China", "Philippines", "Qatar", "Republic of China Taiwan", "Russia", "Saudi Arabia", "Singapore", "South Korea", "Sri Lanka", "Syria", "Tajikistan", "Thailand", "Turkmenistan", "United Arab Emirates", "Uzbekistan", "Vietnam", "Yemen"], "Europe" : ["Albania", "Andorra", "Austria", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Gibraltar", "Greece", "Hungary", "Iceland", "Ireland", "Italy", "Kosovo", "Latvia", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Malta", "Mayotte", "Moldova", "Monaco", "Montenegro", "Netherlands", "Norway", "Poland", "Portugal", "Reunion", "Romania", "San Marino", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey", "Ukraine", "United Kingdom", "Vatican City"], "North America" : ["Anguilla", "Aruba", "Bermuda", "British Virgin Islands", "Canada", "Cayman Islands", "Curacao", "French West Indies", "Mexico", "Montserrat", "Turks and Caicos Islands", "United States Virgin Islands", "United States"], "Central America and the Antilles" : ["Antigua and Barbuda", "Bahamas", "Barbados", "Belize", "Costa Rica", "Cuba", "Dominica", "Dominican Republic", "El Salvador", "Grenada", "Guatemala", "Haiti", "Honduras", "Jamaica", "Nicaragua", "Panama", "Puerto Rico", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Trinidad and Tobago", "Turks and Caicos Islands"], "South America" : ["Argentina", "Bolivia", "Brazil", "Chile", "Colombia", "Ecuador", "French Guiana", "Guyana", "Paraguay", "Peru", "Suriname", "Uruguay", "Venezuela"], "Oceania" : ["American Samoa", "Australia", "Cook Islands", "Fiji", "Kiribati", "Marshall Islands", "Micronesia", "Nauru", "New Caledonia", "New Zealand", "Niue", "Norfolk Island", "Palau", "Papua New Guinea", "Samoa", "Solomon Islands", "Tonga", "Tuvalu", "Vanuatu" ]}
+
+all_countries = []
+for z in CONTS:
+  all_countries += CONTS[z]
 
 def create_continents_dictionary():
   lookup_conts = {}
@@ -84,20 +90,37 @@ def create_pairwise_networks(nodes, links):
   return (pairwise_nodes, pairwise_links)
 
 def find_reciprocal_network(links, status):
+  #frees = []
   couples = {}
   for x in links[status]:
+    #frees.append(x["source"]["name"])
     if (x["source"]["name"]+"-"+x["target"]["name"]) in couples.keys():
       couples[x["source"]["name"]+"-"+x["target"]["name"]] += 1
       couples[x["target"]["name"]+"-"+x["source"]["name"]] += 1
     else:
       couples[x["source"]["name"]+"-"+x["target"]["name"]] = 1
       couples[x["target"]["name"]+"-"+x["source"]["name"]] = 1
-  network = sorted(list(set(["-".join(sorted(y.split("-"))) for y in couples.keys() if couples[y] == 2])))
-  return sorted([(c, len([n for n in network if (c in n)])) 
-    for c in sorted(list(set([y.split("-")[0] 
+  network = sorted(list(set(["-".join(sorted(y.split("-", 1))) for y in couples.keys() if couples[y] == 2])))
+  #print [x for x in all_countries if x not in list(set(network))]
+  recip_ranked = sorted([(c, len([n for n in network if (c in n)])) 
+    for c in sorted(list(set([y.split("-", 1)[0] 
       for y in couples.keys() if couples[y] == 2]))
     )
   ], key=lambda x: x[1], reverse=True)
+  #return [y for y in all_countries if y not in [x[0] for x in recip_ranked]]
+  return network
+
+def make_network(list_of_edges):
+  G = nx.Graph()
+  for x in list_of_edges:
+    pair = tuple(x.split("-", 1))
+    G.add_edge(pair[0], pair[1])
+  print len(G.edges())
+  pos=nx.fruchterman_reingold_layout(G)
+  nx.draw(G,pos)
+  plt.show()
+  return len(list_of_edges)
+
 
 def main(data_folder, output_key=""):
   nodes = []
@@ -111,8 +134,10 @@ def main(data_folder, output_key=""):
     for s in links:
       links[s] += out[s]
   #print len(links["free"])
-  for t in find_reciprocal_network(links, "free"):
-    print t
+  #print find_reciprocal_network(links, "free")
+  # for t in find_reciprocal_network(links, "free"):
+  #   print t
+  print make_network(find_reciprocal_network(links, "free"))
   pair_dicts = create_pairwise_networks(countries, links)
   # print pair_dicts[1][("North America-Oceania")], len(pair_dicts[1][("North America-Oceania")])
   return json.dumps({"pairwise_nodes": pair_dicts[0], "pairwise_links": pair_dicts[1]})
