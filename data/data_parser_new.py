@@ -2,7 +2,7 @@ import sys, re, os, json
 import networkx as nx
 import matplotlib.pyplot as plt
 
-CONTS = {"Africa" : ["Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cameroon", "Cape Verde", "Central African Republic", "Chad", "Comoros", "Cote dIvoire", "Democratic Republic of the Congo", "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Kenya", "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia", "Niger", "Nigeria", "Republic of the Congo", "Rwanda", "Sao Tome and Principe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Sudan", "Swaziland", "Tanzania", "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe"], "Asia" : ["Afghanistan", "Armenia", "Azerbaijan", "Bahrain", "Bangladesh", "Bhutan", "Brunei", "Cambodia", "East Timor", "French Polynesia", "Guam", "Hong Kong", "India", "Indonesia", "Iran", "Iraq", "Israel", "Japan", "Jordan", "Kazakhstan", "Kuwait", "Kyrgyzstan", "Laos", "Lebanon", "Macau", "Malaysia", "Maldives", "Mongolia", "Myanmar", "Nepal", "North Korea", "Northern Mariana Islands", "Oman", "Pakistan", "Palestine", "Peoples Republic of China", "Philippines", "Qatar", "Republic of China Taiwan", "Russia", "Saudi Arabia", "Singapore", "South Korea", "Sri Lanka", "Syria", "Tajikistan", "Thailand", "Turkmenistan", "United Arab Emirates", "Uzbekistan", "Vietnam", "Yemen"], "Europe" : ["Albania", "Andorra", "Austria", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Gibraltar", "Greece", "Hungary", "Iceland", "Ireland", "Italy", "Kosovo", "Latvia", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Malta", "Mayotte", "Moldova", "Monaco", "Montenegro", "Netherlands", "Norway", "Poland", "Portugal", "Reunion", "Romania", "San Marino", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey", "Ukraine", "United Kingdom", "Vatican City"], "North America" : ["Anguilla", "Aruba", "Bermuda", "British Virgin Islands", "Canada", "Cayman Islands", "Curacao", "French West Indies", "Mexico", "Montserrat", "Turks and Caicos Islands", "United States Virgin Islands", "United States"], "Central America and the Antilles" : ["Antigua and Barbuda", "Bahamas", "Barbados", "Belize", "Costa Rica", "Cuba", "Dominica", "Dominican Republic", "El Salvador", "Grenada", "Guatemala", "Haiti", "Honduras", "Jamaica", "Nicaragua", "Panama", "Puerto Rico", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Trinidad and Tobago", "Turks and Caicos Islands"], "South America" : ["Argentina", "Bolivia", "Brazil", "Chile", "Colombia", "Ecuador", "French Guiana", "Guyana", "Paraguay", "Peru", "Suriname", "Uruguay", "Venezuela"], "Oceania" : ["American Samoa", "Australia", "Cook Islands", "Fiji", "Kiribati", "Marshall Islands", "Micronesia", "Nauru", "New Caledonia", "New Zealand", "Niue", "Norfolk Island", "Palau", "Papua New Guinea", "Samoa", "Solomon Islands", "Tonga", "Tuvalu", "Vanuatu" ]}
+CONTS = {"Africa" : ["Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cameroon", "Cape Verde", "Central African Republic", "Chad", "Comoros", "Cote dIvoire", "Democratic Republic of the Congo", "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea Bissau", "Kenya", "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia", "Niger", "Nigeria", "Republic of the Congo", "Rwanda", "Sao Tome and Principe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Sudan", "Swaziland", "Tanzania", "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe"], "Asia" : ["Afghanistan", "Armenia", "Azerbaijan", "Bahrain", "Bangladesh", "Bhutan", "Brunei", "Cambodia", "East Timor", "French Polynesia", "Guam", "Hong Kong", "India", "Indonesia", "Iran", "Iraq", "Israel", "Japan", "Jordan", "Kazakhstan", "Kuwait", "Kyrgyzstan", "Laos", "Lebanon", "Macau", "Malaysia", "Maldives", "Mongolia", "Myanmar", "Nepal", "North Korea", "Northern Mariana Islands", "Oman", "Pakistan", "Palestine", "Peoples Republic of China", "Philippines", "Qatar", "Republic of China Taiwan", "Russia", "Saudi Arabia", "Singapore", "South Korea", "Sri Lanka", "Syria", "Tajikistan", "Thailand", "Turkmenistan", "United Arab Emirates", "Uzbekistan", "Vietnam", "Yemen"], "Europe" : ["Albania", "Andorra", "Austria", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria", "Croatia", "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Gibraltar", "Greece", "Hungary", "Iceland", "Ireland", "Italy", "Kosovo", "Latvia", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Malta", "Mayotte", "Moldova", "Monaco", "Montenegro", "Netherlands", "Norway", "Poland", "Portugal", "Reunion", "Romania", "San Marino", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey", "Ukraine", "United Kingdom", "Vatican City"], "North America" : ["Anguilla", "Aruba", "Bermuda", "British Virgin Islands", "Canada", "Cayman Islands", "Curacao", "French West Indies", "Mexico", "Montserrat", "Turks and Caicos Islands", "United States Virgin Islands", "United States"], "Central America and the Antilles" : ["Antigua and Barbuda", "Bahamas", "Barbados", "Belize", "Costa Rica", "Cuba", "Dominica", "Dominican Republic", "El Salvador", "Grenada", "Guatemala", "Haiti", "Honduras", "Jamaica", "Nicaragua", "Panama", "Puerto Rico", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Trinidad and Tobago", "Turks and Caicos Islands"], "South America" : ["Argentina", "Bolivia", "Brazil", "Chile", "Colombia", "Ecuador", "French Guiana", "Guyana", "Paraguay", "Peru", "Suriname", "Uruguay", "Venezuela"], "Oceania" : ["American Samoa", "Australia", "Cook Islands", "Fiji", "Kiribati", "Marshall Islands", "Micronesia", "Nauru", "New Caledonia", "New Zealand", "Niue", "Norfolk Island", "Palau", "Papua New Guinea", "Samoa", "Solomon Islands", "Tonga", "Tuvalu", "Vanuatu" ]}
 
 all_countries = []
 for z in CONTS:
@@ -18,14 +18,14 @@ def create_continents_dictionary():
 
 def parse_lines_into_links(filename, cont_dict):
   '''out_United_States'''
-  source_name = " ".join(re.sub(r'out_','',filename).split("_"))[12:]
+  source_name = " ".join(re.sub(r'out_','',filename).split("_"))[12:].replace("Guinea-Bissau", "Guinea Bissau")
   source = {"name": source_name, "continent": cont_dict[source_name][0], 'y': cont_dict[source_name][1]}
   d = {}
   link_types = {"free":[], "required": [], "onarrival": [], "refused": []}
   for i,line in enumerate(open(filename).readlines()):
     line = line.rstrip()
     if (i%3==0):
-      target_name = line.replace("'", "").replace("&#039;", "").replace("(Taiwan)", "Taiwan").replace("\xc3\xa7", "c")
+      target_name = line.replace("'", "").replace("&#039;", "").replace("(Taiwan)", "Taiwan").replace("\xc3\xa7", "c").replace("Guinea-Bissau", "Guinea Bissau")
       target = {"name": target_name, "continent": cont_dict[target_name][0], 'y': cont_dict[target_name][1]}
     elif (i%3==1):
       status = line.split(":")[0].split("-")[1]
@@ -89,9 +89,11 @@ def create_pairwise_networks(nodes, links):
   #print len(pairwise_nodes[("North America-Africa")])#, pairwise_nodes[("North America-Africa")][:10]
   return (pairwise_nodes, pairwise_links)
 
-def find_reciprocal_network(links, status):
+def find_reciprocal_network(nodes, links, countries, status):
   #frees = []
   couples = {}
+  recip_nodes = {}
+  recip_links = {}
   for x in links[status]:
     #frees.append(x["source"]["name"])
     if (x["source"]["name"]+"-"+x["target"]["name"]) in couples.keys():
@@ -100,17 +102,25 @@ def find_reciprocal_network(links, status):
     else:
       couples[x["source"]["name"]+"-"+x["target"]["name"]] = 1
       couples[x["target"]["name"]+"-"+x["source"]["name"]] = 1
-  network = sorted(list(set(["-".join(sorted(y.split("-", 1))) for y in couples.keys() if couples[y] == 2])))
-  #print [x for x in all_countries if x not in list(set(network))]
-  recip_ranked = sorted([(c, len([n for n in network if (c in n)])) 
-    for c in sorted(list(set([y.split("-", 1)[0] 
+  recip_network = sorted(list(set(["-".join(sorted(y.rsplit("-", 1))) for y in couples.keys() if couples[y] == 2])))
+  recip_ranked = sorted([(c, len([n for n in recip_network if (c in n)])) 
+    for c in sorted(list(set([y.rsplit("-", 1)[0] 
       for y in couples.keys() if couples[y] == 2]))
     )
   ], key=lambda x: x[1], reverse=True)
-  #return [y for y in all_countries if y not in [x[0] for x in recip_ranked]]
-  return network
+  for c in CONTS:
+    recip_nodes[c] = []
+    for i in [x for x in CONTS[c] if x in [s[0] for s in recip_ranked]]:
+      recip_nodes[c] += [n for n in nodes if n["name"] == i]
+  for d in CONTS:
+    recip_links[d] = []
+    for j in [y.rsplit("-", 1) for y in [z for z in couples if couples[z] == 2] if y.rsplit("-", 1)[0] in CONTS[d]]:
+      recip_links[d].append({"source": [n for n in recip_nodes[d] if n["name"]==j[0]][0], "target": [n for n in recip_nodes[countries[j[1]][0]] if n["name"]==j[1]][0]})
+  #return {"nodes": recip_nodes, "links": recip_links}
+  #return recip_network
+  return recip_ranked
 
-def make_network(list_of_edges):
+def make_graph(list_of_edges):
   G = nx.Graph()
   for x in list_of_edges:
     pair = tuple(x.split("-", 1))
@@ -134,10 +144,11 @@ def main(data_folder, output_key=""):
     for s in links:
       links[s] += out[s]
   #print len(links["free"])
-  #print find_reciprocal_network(links, "free")
-  # for t in find_reciprocal_network(links, "free"):
-  #   print t
-  print make_network(find_reciprocal_network(links, "free"))
+  #print find_reciprocal_network(nodes, links, countries, "free")
+  for t in find_reciprocal_network(nodes, links, countries, "free"):
+    print t
+  #print find_reciprocal_network(nodes,links,countries,"free")
+  #print make_graph(find_reciprocal_network(nodes, links, countries, "free"))
   pair_dicts = create_pairwise_networks(countries, links)
   # print pair_dicts[1][("North America-Oceania")], len(pair_dicts[1][("North America-Oceania")])
   return json.dumps({"pairwise_nodes": pair_dicts[0], "pairwise_links": pair_dicts[1]})
