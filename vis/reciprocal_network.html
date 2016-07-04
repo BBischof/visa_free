@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Hive Link Plot</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<style type="text/css">
+	.link{
+		fill: none;
+    stroke: #000;
+		stroke-width: 1px;
+    stroke-opacity: .1;
+	}
+	.axis {
+		stroke: #000;
+		stroke-width: 1.5px;
+	}
+.link.active {
+  stroke-width: 3px;
+  stroke-opacity: 1;
+}
+.node {
+  stroke: #000;
+}
+.node.active {
+  stroke: red;
+  stroke-width: 3px;
+  stroke-opacity: 1;
+}
+.container1{
+  padding-top: 10px;
+  position: relative;
+  left: 0%;
+  top: 20%;
+}
+.container2{
+  position: absolute;
+  left: 0%;
+  top: 27%
+}
+.container3{
+  z-index: 2000000;
+  position: absolute;
+  left: 85%;
+  top: 20%;
+  font: 15px;
+}
+.source{
+  padding-bottom: 5px;
+}
+.container3 .parentP{
+  color: red;
+}
+.container3 .childP{
+  color: steelblue;
+  line-height: 70%;
+}
+.header{
+  width: 1400px;
+  height: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #5d6d7e;
+  color: white;
+  font: 30px palatino;
+}
+.head-txt{
+  position: absolute;
+  left: 20%;
+  top: 5%;
+}
+.plain-text{
+  padding-top: 6px;
+}
+
+	</style>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+</head>
+<body>
+  <header class="header">
+    <p class="head-txt">International Travel Visa Topology — Hive Plot Visualization</p>
+  </header>
+   <div class="container1 container">
+    <div class="source row">
+      <div class="col-md-2 plain-text">Source Continent:</div>
+      <div class="col-md-3">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="source">Europe<span class="caret"></span></button>
+        <ul class="dropdown-menu" id="source">
+          <li><a href="#">Asia</a></li>
+          <li><a href="#">Africa</a></li>
+          <li><a href="#">Europe</a></li>
+          <li><a href="#">North America</a></li>
+          <li><a href="#">South America</a></li>
+          <li><a href="#">Central America and the Antilles</a></li>
+          <li><a href="#">Oceania</a></li>
+        </ul>
+      </div>
+
+      <!-- <div class="col-md-2 plain-text">Target Continent:</div>
+      <div class="col-md-3">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="target">North America<span class="caret"></span></button>
+        <ul class="dropdown-menu" id="target">
+          <li><a href="#">Asia</a></li>
+          <li><a href="#">Africa</a></li>
+          <li><a href="#">Europe</a></li>
+          <li><a href="#">North America</a></li>
+          <li><a href="#">South America</a></li>
+          <li><a href="#">Central America and the Antilles</a></li>
+          <li><a href="#">Oceania</a></li>
+        </ul>
+      </div>
+    </div>
+  </div> -->
+
+<div class="container3">
+</div>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.10.0/d3-legend.js"></script>
+<script type="text/javascript" src="../static/d3.hive.min.js"></script>
+<script type="text/javascript">
+
+var source_cont = "Europe";
+
+
+$("#source li a").click(function(){
+  var sidePane = d3.select(".container3")
+  sidePane.html("")
+  sidePane.selectAll("p")
+    .remove()
+  source_cont = $(this).text();
+  $("#source:first-child").text(source_cont);
+  plot(source_cont);
+});
+
+
+
+plot(source_cont);
+
+function plot(source_cont){
+  d3.select("svg")
+    .remove();
+var width = 1200;
+var height = 1200;
+var outerRadius = 500;
+var innerRadius = 150;
+var minLength = 5;
+
+// if ((source_cont == 'Asia'){
+//   innerRadius = 160;
+// } 
+
+var visa_types = {"Origin":0, "Asia":1, "Africa":2, "Europe":3, "North America":4, "South America":5, "Central America and the Antilles":6, "Oceania":7};
+
+var angle = d3.scale.ordinal()
+    .domain(["Origin", "Asia", "Africa", "Europe", "North America", "South America", "Central America and the Antilles", "Oceania"])
+    .rangePoints([0, 2 * Math.PI- Math.PI/4]);
+
+
+
+var radius = d3.scale.linear()
+		.range([innerRadius, outerRadius]);
+
+var color = d3.scale.ordinal()
+    .domain(["Origin", "Asia", "Africa", "Europe", "North America", "South America", "Central America and the Antilles", "Oceania"])
+    .range(["yellow", "blue", "red", "orange", "green", "purple", "brown", "pink"]);
+
+var svg = d3.select("body").append("svg")
+    .attr("class", "svg")
+		.attr("width", width)
+		.attr("height", height)
+	.append("g")
+		.attr("transform", "translate(" + width/2.35 + "," + height/2.3 + ")");
+
+svg.append("g")
+    .attr("class", "legendOrdinal")
+    .attr("transform", "translate(-410, -500)");
+var legendOrdinal = d3.legend.color()
+    .scale(color);
+
+d3.json("reciprocal_source_networks.json", function(error, graph){
+  nodes = graph[source_cont].nodes;
+  links = graph[source_cont].links;
+
+  // var free_links = new Set(links.filter(function(p){ return p.target.continent == 'free';}).map(function(d){return d.target.name}));
+
+  // var onarrival_links = new Set(links.filter(function(p){ return p.target.continent == 'onarrival';}).map(function(d){return d.target.name}));
+  
+  // var required_links = new Set(links.filter(function(p){ return p.target.continent == 'required';}).map(function(d){return d.target.name}));
+  
+  // var refused_links = new Set(links.filter(function(p){ return p.target.continent == 'refused';}).map(function(d){return d.target.name}));
+
+  var source_nodes = nodes.filter(function(p){return p.continent == 'Origin'});
+  var asia_nodes = nodes.filter(function(p){return p.continent == 'Asia'});
+  var africa_nodes = nodes.filter(function(p){return p.continent == 'Africa'});
+  var europe_nodes = nodes.filter(function(p){return p.continent == 'Europe'});
+  var north_america_nodes = nodes.filter(function(p){return p.continent == 'North America'});
+  var south_america_nodes = nodes.filter(function(p){return p.continent == 'South America'});
+  var central_america_nodes = nodes.filter(function(p){return p.continent == 'Central America and the Antilles'});
+  var oceania_nodes = nodes.filter(function(p){return p.continent == 'Oceania'});
+
+
+  var visa_lengths = [{'name': 'Origin', 'length': source_nodes.length}, {'name': 'Asia', 'length': asia_nodes.length}, {'name': 'Africa', 'length': africa_nodes.length}, {'name': 'Europe', 'length': europe_nodes.length}, {'name': 'North America', 'length': north_america_nodes.length}, {'name': 'South America', 'length': south_america_nodes.length}, {'name': 'Central America and the Antilles', 'length': central_america_nodes.length}, {'name': 'Oceania', 'length': oceania_nodes.length}];
+
+  var visa_obj = {'Origin': source_nodes.length, 'Asia': asia_nodes.length, 'Africa': africa_nodes.length, 'Europe': europe_nodes.length, 'North America': north_america_nodes.length, 'South America': south_america_nodes.length, 'Central America and the Antilles': central_america_nodes.length, 'Oceania':  oceania_nodes.length};
+
+
+  radius.domain(d3.extent(visa_lengths, function(d){ return d.length;}));
+
+  // console.log(radius());
+  // console.log(radius("Asia"));
+
+  svg.selectAll(".axis")
+      .data(visa_lengths)
+    .enter().append("line")
+      .attr("class", "axis")
+      .attr("transform", function(d, i){ console.log(angle(d.name));
+        return "rotate(" + degrees(angle(d.name)) + ")";})
+      .attr("x1", radius.range()[0])
+      .attr("x2", function(d){return radius(d.length);})
+      ;
+
+  svg.selectAll(".link")
+      .data(links)
+    .enter().append("path")
+      .attr("class", "link")
+      .attr("d", d3.hive.link()
+      .angle(function(d) { return angle(d.continent); })
+      .radius(function(d) { return radius(visa_obj[d.continent] * d.y); }))
+      .style("stroke", function(d) { return color(d.target.continent);})
+      .on("mouseover", linkMouseover)
+      .on("mouseout", mouseout)
+      .append("title")
+      .text(function(d){ return d.source.name + ' --> ' + d.target.name 
+      })
+      ;
+
+  svg.selectAll(".node")
+      .data(nodes)
+    .enter().append("circle")
+      .attr("class", "node")
+      .attr("transform", function(d) { console.log(d.continent);
+        return "rotate(" + degrees(angle(d.continent)) + ")"; })
+      .attr("cx", function(d) { return radius(visa_obj[d.continent] * d.y); })
+      .attr("r", 5)
+      .style("fill", function(d) { return color(d.continent);})
+      // .on("click", nodeClick)
+      .on("mouseover", nodeMouseover)
+      .on("mouseout", mouseout)
+      .append("title")
+      .text(function(d){ return d.name; })
+      ;
+
+  var legendOrdinal = d3.legend.color()
+    .scale(color);
+  svg.select(".legendOrdinal")
+    .call(legendOrdinal);
+
+  function linkMouseover(d) {
+    svg.selectAll(".link").classed("active", function(p) { return p === d; });
+    svg.selectAll(".node").classed("active", function(x) { return x.name === d.source.name || x.name === d.target.name; });
+  }
+
+  function nodeMouseover(d) {
+    svg.selectAll(".link").classed("active", function(p) { return (p.source.name === d.name && p.source.continent == d.continent) || (p.target.name === d.name && p.target.continent == d.continent); });
+    d3.select(this).classed("active", true);
+  }
+
+  function nodeClick(d){
+    var relavant_nodes = {'free': [], 'onarrival':[], 'required': [], 'refused':[]};
+    links.forEach(function(p){
+      if (p.source.name == d.name){
+        relavant_nodes[p.target.continent].push(p.target.name)
+      }
+    })
+    var side_panel = d3.select('.container3');
+    side_panel.html("");
+    side_panel.html('<strong>Country: </strong>' + d.name + '<br></br>');
+    for (key in relavant_nodes){
+      if (relavant_nodes[key].length != 0){
+      var key_item = side_panel.append("p")
+        .attr("class", "parentP")
+        .html('<strong>Visa ' + key.toUpperCase() + ":" + '</strong>');
+      relavant_nodes[key].forEach(function(d){
+        side_panel.append("p")
+          .attr("class", "childP")
+          .html(d);
+      })
+    }
+    }
+  }
+
+  function mouseout() {
+    svg.selectAll(".active").classed("active", false);
+  }
+
+  });
+}
+
+function degrees(radians) {
+  return radians / Math.PI * 180 - 90;
+}
+
+</script>
+
+</body>
+</html>
